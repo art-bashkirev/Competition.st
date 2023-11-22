@@ -5,12 +5,12 @@
 
 typedef char *string;
 
-const string alphabet = "abcdefghijklmnopqrstuvwxyz";
-const string fpth = "/usr/local/bin/stubs/stub.";
+const char alphabet[] = "abcdefghijklmnopqrstuvwxyz";
+const char fpth[] = "/usr/local/bin/stubs/stub.";
 
 void create_files(int n, string lang);
 
-int main(int argc, string argv[])
+int main(int argc, char *argv[])
 {
     if (argc != 3)
     {
@@ -19,16 +19,16 @@ int main(int argc, string argv[])
     }
 
     int n = atoi(argv[1]);
-    string lang = argv[2];
+    char lang[5];
 
-    printf("Starting");
+    strncpy(lang, argv[2], 4);
 
     create_files(n, lang);
 
     return 0;
 }
 
-void create_files(int n, string lang)
+void create_files(int n, char lang[])
 {
     if (n > 26 || n < 1)
     {
@@ -36,16 +36,9 @@ void create_files(int n, string lang)
         exit(1);
     }
 
-    printf("Allocating stub_file_ptr...");
-    string stub_file_ptr = malloc(strlen(fpth) + strlen(lang) + 32);
-    if (stub_file_ptr == NULL) {
-        printf("Could not allocate memory for stub file pointer\n");
-        exit(1);
-    }
-    printf("Copying fpth to stub_file_ptr...");
-    strcpy(stub_file_ptr, fpth);
-    printf("Appending the file extension to stub_file_ptr...");
-    strcat(stub_file_ptr, lang);
+    char stub_file_ptr[32];
+
+    sprintf(stub_file_ptr, "%s%s", fpth, lang);
 
     FILE *stub_file = fopen(stub_file_ptr, "r");
     if (stub_file == NULL)
@@ -73,9 +66,8 @@ void create_files(int n, string lang)
 
     for (int i = 0; i < n; i++)
     {
-        string filename = "", tmp = "";
-        sprintf(tmp, "%c.%s", alphabet[i], lang);
-        strcpy(filename, tmp);
+        char filename[7];
+        sprintf(filename, "%c.%s", alphabet[i], lang);
         FILE *fp = fopen(filename, "w");
         if (fp == NULL)
         {
