@@ -1,11 +1,19 @@
-all:    testapp.c
-    $(CC) -o testapp     testapp.c
+CC = gcc
+CFLAGS = -g -Wall
+TARGET = st
+STUB_FILES = stubs/stub.c stubs/stub.cpp stubs/stub.py
+STUB_DIR = /usr/local/bin
+
+all: $(TARGET)
+
+$(TARGET): $(TARGET).c
+	$(CC) $(CFLAGS) -o $(TARGET) $(TARGET).c
+
+install: all
+	mkdir -p $(STUB_DIR)/stubs
+	cp -R stubs/* $(STUB_DIR)/stubs
+	mkdir -p $(DESTDIR)/usr/bin
+	install -m 0755 $(TARGET) $(DESTDIR)/usr/bin/$(TARGET)
 
 clean:
-    rm -f testapp
-
-install: testapp
-    ./installer.sh /opt/testapp kiwi kiwi
-
-purge:
-    rm -rf /opt/testapp
+	rm -f $(TARGET)
