@@ -10,7 +10,7 @@ $ make install # or sudo make install
 
 ## Usage
 ```zsh
-st [x] [lang]
+$ st [x] [lang]
 x - the number of problems
 lang - the language of the created stubs
 ```
