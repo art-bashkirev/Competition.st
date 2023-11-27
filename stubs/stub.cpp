@@ -34,7 +34,7 @@ using namespace std;
 #define wl(cond) while (cond)
 #define to_lower(s) transform(s.begin(), s.end(), s.begin(), ::tolower)
 #define to_upper(s) transform(s.begin(), s.end(), s.begin(), ::toupper)
-#define sz(v) ((int)(v).size())
+#define sz(v) ((ll)(v).size())
 #define all(v) (v).begin(), (v).end()
 #define mod 1000000007
 
