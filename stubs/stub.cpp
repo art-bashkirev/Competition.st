@@ -1,3 +1,5 @@
+#pragma GCC optimize("Ofast")
+#pragma GCC target("avx2")
 #include <iostream>
 #include <iterator>
 #include <algorithm>
