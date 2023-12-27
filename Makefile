@@ -1,7 +1,6 @@
-CC = gcc
-CFLAGS = -g -Wall
+CC = clang
+CFLAGS = -O3 -Wall
 TARGET = st
-STUB_FILES = stubs/stub.c stubs/stub.cpp stubs/stub.py
 STUB_DIR = /usr/local/bin
 
 all: $(TARGET)
