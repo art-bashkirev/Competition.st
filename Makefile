@@ -1,4 +1,4 @@
-CC = clang
+CC = gcc
 CFLAGS = -O3 -Wall
 TARGET = st
 STUB_DIR = /usr/local/bin
