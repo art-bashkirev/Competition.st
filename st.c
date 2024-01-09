@@ -17,14 +17,12 @@ int main(int argc, char *argv[])
     {
         printf("Error: not 2 arguments\nUsage: st [x] [lang]\n\t"
                "x: int - 1..26 - the number of problems\n\t"
-               "lang: str - e.g. c, cpp, "
-               "java, py\n");
+               "lang: str - e.g. c, cpp\n");
         exit(1);
     }
 
     int n = atoi(argv[1]);
     char lang[strlen(argv[2]) + 1];
-
     strncpy(lang, argv[2], 4);
 
     create_files(n, lang);
