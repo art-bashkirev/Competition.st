@@ -16,6 +16,14 @@ lang - the language of the created stubs
 ```
 
 ```zsh
-$ st 5 cpp # Creates 5 alphabetically numbered stubs in C++
-$ st 3 py  # Creates 3 alphabetically numbered stubs in Python
+$ st 5 cpp # Creates 5 alphabetically "numbered" stubs in C++
+$ st 3 py  # Creates 3 alphabetically "numbered" stubs in Python
 ```
+
+## Stub creation
+
+Located by default on "/usr/local/bin/stubs/stub.{lang}"
+
+---
+
+Pre-installed on [artbashkirev/codespace:comp](https://hub.docker.com/r/artbashkirev/codespace/tags)
