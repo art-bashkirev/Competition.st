@@ -26,4 +26,4 @@ Located by default on "/usr/local/bin/stubs/stub.{lang}"
 
 ---
 
-Pre-installed on [artbashkirev/codespace:comp](https://hub.docker.com/r/artbashkirev/codespace/tags)
+Pre-installed on [artbashkirev/codespace:comp](https://hub.docker.com/r/artbashkirev/codespace/tags?page=1&name=comp)
