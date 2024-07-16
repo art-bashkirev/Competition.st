@@ -1,5 +1,5 @@
 # Competition.st
-A command-line utility to quickly generate problem files from stubs for competitions
+A command-line utility to quickly generate problem files from templates for competitive programming
 
 ## Installation
 ```zsh
@@ -20,9 +20,9 @@ st 5 cpp # Creates 5 alphabetically "numbered" stubs for C++
 st 3 py  # Creates 3 alphabetically "numbered" stubs for Python
 ```
 
-## Stub creation
+## Template creation
 
-Located by default on "~/st/stub.{lang}"
+The templates are located in `~/st/stub.{lang}`.
 
 ---
 
