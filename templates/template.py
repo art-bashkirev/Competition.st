@@ -26,6 +26,7 @@ mod     = 1000000007
 
 def main():
     # ...code... lonely here...
+    ...
 
 
 
