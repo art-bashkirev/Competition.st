@@ -7,7 +7,7 @@
 typedef char *string;
 
 const char alphabet[] = "abcdefghijklmnopqrstuvwxyz";
-const char fpth[] = "~/st/templates/template.";
+const char fpth[] = "~/cst/templates/template.";
 
 void create_files(int n, char lang[]);
 

@@ -13,19 +13,19 @@ make install
 ## Usage
 
 ```zsh
-$ st [x] [lang]
+$ cst [x] [lang]
 x - the number of problems
 lang - the language of the created problem files from templates
 ```
 
 ```zsh
-st 5 cpp # Creates 5 alphabetically "numbered" files from C++
-st 3 py  # Creates 3 alphabetically "numbered" files from Python
+cst 5 cpp # Creates 5 alphabetically "numbered" files from C++
+cst 3 py  # Creates 3 alphabetically "numbered" files from Python
 ```
 
 ## Template creation
 
-The templates are located in `~/st/templates/template.{lang}`.
+The templates are located in `~/cst/templates/template.{lang}`.
 
 ---
 
