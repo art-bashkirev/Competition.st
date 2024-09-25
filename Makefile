@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -O3 -Wall
-TARGET = st
+TARGET = cst
 TEMPLATE_DIR = ~/cst/templates
 
 all: $(TARGET)
