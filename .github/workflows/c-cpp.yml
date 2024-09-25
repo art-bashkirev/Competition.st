@@ -19,6 +19,6 @@ jobs:
       run: sudo make install
     - name: run tests
       run: |
-        st 4 cpp
+        cst 4 cpp
         ls -al
 
