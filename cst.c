@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 {
     if (argc != 3)
     {
-        printf("Error: not 2 arguments\nUsage: st [x] [lang]\n\t"
+        printf("Error: not 2 arguments\nUsage: cst [x] [lang]\n\t"
                "x: int - 1..26 - the number of problems\n\t"
                "lang: str - e.g. c, cpp\n");
         exit(1);
@@ -39,37 +39,37 @@ void create_files(int n, char lang[])
         exit(1);
     }
 
-    unsigned long stub_file_path_size = strlen(fpth) + strlen(lang);
-    string stub_file_path = malloc(stub_file_path_size + 1);
+    unsigned long template_file_path_size = strlen(fpth) + strlen(lang);
+    string template_file_path = malloc(template_file_path_size + 1);
 
-    sprintf(stub_file_path, "%s%s", fpth, lang);
+    sprintf(template_file_path, "%s%s", fpth, lang);
 
-    FILE *stub_file = fopen(stub_file_path, "r");
+    FILE *template_file = fopen(template_file_path, "r");
 
-    if (stub_file == NULL)
+    if (template_file == NULL)
     {
-        printf("Could not open file %s\n", stub_file_path);
+        printf("Could not open file %s\n", template_file_path);
         exit(1);
     }
-    free(stub_file_path);
+    free(template_file_path);
 
-    // Get the size of the stub file
-    fseek(stub_file, 0, SEEK_END);
-    unsigned long stub_size = ftell(stub_file);
-    rewind(stub_file);
+    // Get the size of the template file
+    fseek(template_file, 0, SEEK_END);
+    unsigned long template_size = ftell(template_file);
+    rewind(template_file);
 
-    // Read the contents of the stub file
-    if (stub_size == 0 || stub_size + 1 == 0) // SonarLint tricks
+    // Read the contents of the template file
+    if (template_size == 0 || template_size + 1 == 0) // SonarLint tricks
     {
-        printf("Memory for stub contents not properly allocated");
+        printf("Memory for template contents not properly allocated");
         exit(1);
     }
 
-    string stub_contents = malloc(stub_size + 1);
+    string template_contents = malloc(template_size + 1);
 
-    fread(stub_contents, MAXLEN, stub_size, stub_file);
+    fread(template_contents, MAXLEN, template_size, template_file);
 
-    fclose(stub_file);
+    fclose(template_file);
 
     for (int i = 0; i < n; i++)
     {
@@ -85,11 +85,11 @@ void create_files(int n, char lang[])
             continue;
         }
 
-        fputs(stub_contents, fp);
+        fputs(template_contents, fp);
 
         fclose(fp);
         free(filename);
     }
 
-    free(stub_contents);
+    free(template_contents);
 }
