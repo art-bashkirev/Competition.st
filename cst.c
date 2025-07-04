@@ -6,6 +6,7 @@
 // --- Function Prototypes ---
 void create_files(int n, const char *lang, const char *mode);
 char *read_template(const char *lang, long *file_size);
+char *get_template_path(const char *lang);
 
 // --- Main ---
 int main(int argc, char *argv[])
@@ -42,6 +43,36 @@ int main(int argc, char *argv[])
 }
 
 /**
+ * @brief Gets the template path from environment variables or defaults.
+ *
+ * This function checks the following in order:
+ * 1. CST_TEMPLATE_DIR (custom directory)
+ * 2. HOME (Unix-like systems)
+ * 3. USERPROFILE (Windows)
+ * 4. Falls back to a local "templates" directory.
+ *
+ * @param lang The language extension (e.g., "c", "cpp") to find the template.
+ * @return A string with the template file path.
+ */
+char *get_template_path(const char *lang) {
+    static char path_buffer[1024];
+    const char *custom_dir = getenv("CST_TEMPLATE_DIR");
+    const char *home_dir = getenv("HOME");
+    const char *userprofile = getenv("USERPROFILE");
+    if (custom_dir) {
+        snprintf(path_buffer, sizeof(path_buffer), "%s/template.%s", custom_dir, lang);
+    } else if (home_dir) {
+        snprintf(path_buffer, sizeof(path_buffer), "%s/cst/templates/template.%s", home_dir, lang);
+    } else if (userprofile) {
+        snprintf(path_buffer, sizeof(path_buffer), "%s/cst/templates/template.%s", userprofile, lang);
+    } else {
+        // fallback to local directory
+        snprintf(path_buffer, sizeof(path_buffer), "templates/template.%s", lang);
+    }
+    return path_buffer;
+}
+
+/**
  * @brief Reads the content of the specified template file into a buffer.
  *
  * @param lang The language extension (e.g., "c", "cpp") to find the template.
@@ -51,25 +82,11 @@ int main(int argc, char *argv[])
  */
 char *read_template(const char *lang, long *file_size)
 {
-    char path_buffer[1024];
-    const char *home_dir = getenv("HOME");
-
-    // Handle cases where HOME environment variable might not be set
-    if (home_dir == NULL)
-    {
-        fprintf(stderr, "Error: Could not resolve HOME directory.\n");
-        return NULL;
-    }
-
-    // Construct the full path to the template file
-    // snprintf is safer than sprintf as it prevents buffer overflows.
-    snprintf(path_buffer, sizeof(path_buffer), "%s/cst/templates/template.%s", home_dir, lang);
-
-    FILE *template_file = fopen(path_buffer, "r");
+    char *path = get_template_path(lang);
+    FILE *template_file = fopen(path, "r");
     if (template_file == NULL)
     {
-        // perror provides a more descriptive error message (e.g., "No such file or directory")
-        fprintf(stderr, "Error opening template file '%s': ", path_buffer);
+        fprintf(stderr, "Error opening template file '%s': ", path);
         perror("");
         return NULL;
     }
@@ -133,27 +150,26 @@ void create_files(int n, const char *lang, const char *mode)
     const char alphabet[] = "abcdefghijklmnopqrstuvwxyz";
     printf("Creating %d file(s) with extension '.%s' in %s mode...\n", n, lang, mode);
 
+    int mode_letters = 0, mode_digits = 0;
+    if (strcmp(mode, "l") == 0 || strcmp(mode, "letters") == 0) mode_letters = 1;
+    else if (strcmp(mode, "d") == 0 || strcmp(mode, "digits") == 0) mode_digits = 1;
+    else if (strcmp(mode, "ld") == 0 || strcmp(mode, "both") == 0) { mode_letters = 1; mode_digits = 1; }
+    else {
+        fprintf(stderr, "Unknown mode '%s'. Use 'l', 'd', 'ld', 'letters', 'digits', or 'both'.\n", mode);
+        free(template_contents);
+        exit(1);
+    }
     for (int i = 0; i < n; i++)
     {
         char filename[32];
-        if (strcmp(mode, "l") == 0) // letters
-        {
+        if (mode_letters && !mode_digits)
             snprintf(filename, sizeof(filename), "%c.%s", alphabet[i], lang);
-        }
-        else if (strcmp(mode, "d") == 0) // digits
-        {
+        else if (!mode_letters && mode_digits)
             snprintf(filename, sizeof(filename), "%d.%s", i + 1, lang);
-        }
-        else if (strcmp(mode, "ld") == 0) // letter+digit
-        {
+        else if (mode_letters && mode_digits)
             snprintf(filename, sizeof(filename), "%c%d.%s", alphabet[i], i + 1, lang);
-        }
         else
-        {
-            fprintf(stderr, "Unknown mode '%s'. Use 'l', 'd', or 'ld'.\n", mode);
-            free(template_contents);
-            exit(1);
-        }
+            snprintf(filename, sizeof(filename), "%d.%s", i + 1, lang); // fallback
 
         FILE *fp = fopen(filename, "w");
         if (fp == NULL)
