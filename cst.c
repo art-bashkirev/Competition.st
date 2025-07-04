@@ -17,7 +17,8 @@ int main(int argc, char *argv[])
     {
         printf("Error: not 2 arguments\nUsage: cst [x] [lang]\n\t"
                "x: int - 1..26 - the number of problems\n\t"
-               "lang: str - e.g. c, cpp\n");
+               "lang: str - e.g. c, cpp\n\t"
+                "mode: a - alphabet, d - digits\n");
         exit(1);
     }
 
