@@ -1,7 +1,16 @@
 CC = gcc
 CFLAGS = -O3 -Wall
 TARGET = cst
-TEMPLATE_DIR ?= $(HOME)/cst/templates
+# Use HOME if set, otherwise USERPROFILE (for Windows)
+ifeq ($(strip $(HOME)),)
+  ifneq ($(strip $(USERPROFILE)),)
+    TEMPLATE_DIR := $(USERPROFILE)/cst/templates
+  else
+    TEMPLATE_DIR := ./cst/templates
+  endif
+else
+  TEMPLATE_DIR := $(HOME)/cst/templates
+endif
 
 all: $(TARGET)
 
