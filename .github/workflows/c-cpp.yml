@@ -17,6 +17,11 @@ jobs:
       run: make
     - name: make install
       run: sudo make install
+    - name: check cst in PATH and templates
+      run: |
+        which cst
+        cst --help || true
+        sudo make check-path
     - name: run tests
       run: |
         cst 4 cpp
