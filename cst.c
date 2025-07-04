@@ -1,96 +1,146 @@
-#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define MAXLEN 10000
+#include <errno.h> // For error reporting
 
-typedef char *string;
+// --- Function Prototypes ---
+void create_files(int n, const char *lang);
+char* read_template(const char *lang, long *file_size);
 
-const char alphabet[] = "abcdefghijklmnopqrstuvwxyz";
-const char fpth[] = "~/cst/templates/template.";
-
-void create_files(int n, char lang[]);
-
-int main(int argc, char *argv[])
-{
-    if (argc != 3)
-    {
-        printf("Error: not 2 arguments\nUsage: cst [x] [lang]\n\t"
-               "x: int - 1..26 - the number of problems\n\t"
-               "lang: str - e.g. c, cpp\n\t"
-                "mode: a - alphabet, d - digits\n");
-        exit(1);
+// --- Main ---
+int main(int argc, char *argv[]) {
+    // Check for the correct number of arguments
+    if (argc != 3) {
+        // Print a more detailed usage message
+        fprintf(stderr, "Usage: %s <num_problems> <language_extension>\n", argv[0]);
+        fprintf(stderr, "Example: %s 5 cpp\n\n", argv[0]);
+        fprintf(stderr, "  <num_problems>: An integer from 1 to 26.\n");
+        fprintf(stderr, "  <language_extension>: The file extension (e.g., c, cpp, py).\n");
+        return 1; // Use return 1 for error
     }
 
-    int n = atoi(argv[1]);
-    char lang[strlen(argv[2]) + 1];
-    strncpy(lang, argv[2], 4);
+    // Use strtol for safer string-to-integer conversion
+    char *endptr;
+    long n = strtol(argv[1], &endptr, 10);
 
-    create_files(n, lang);
+    // Check if the conversion was successful and the value is in range
+    if (endptr == argv[1] || *endptr != '\0' || n < 1 || n > 26) {
+        fprintf(stderr, "Error: Invalid number of problems. Must be an integer between 1 and 26.\n");
+        return 1;
+    }
+
+    // Use the pointer directly.
+    const char *lang = argv[2];
+
+    create_files((int)n, lang);
 
     return 0;
 }
 
-void create_files(int n, char lang[])
-{
-    // Checks
-    if (n < 1 || n > 26)
-    {
-        printf("Error: Wrong value\nx: int - 1..26 - the number of problems\n");
-        exit(1);
+/**
+ * @brief Reads the content of the specified template file into a buffer.
+ *
+ * @param lang The language extension (e.g., "c", "cpp") to find the template.
+ * @param file_size Pointer to a long to store the size of the file.
+ * @return A dynamically allocated buffer with the file contents, or NULL on error.
+ * The caller is responsible for freeing this buffer.
+ */
+char* read_template(const char *lang, long *file_size) {
+    char path_buffer[1024];
+    const char *home_dir = getenv("HOME");
+
+    // Handle cases where HOME environment variable might not be set
+    if (home_dir == NULL) {
+        fprintf(stderr, "Error: Could not resolve HOME directory.\n");
+        return NULL;
     }
 
-    unsigned long template_file_path_size = strlen(fpth) + strlen(lang);
-    string template_file_path = malloc(template_file_path_size + 1);
+    // Construct the full path to the template file
+    // snprintf is safer than sprintf as it prevents buffer overflows.
+    snprintf(path_buffer, sizeof(path_buffer), "%s/cst/templates/template.%s", home_dir, lang);
 
-    sprintf(template_file_path, "%s%s", fpth, lang);
-
-    FILE *template_file = fopen(template_file_path, "r");
-
-    if (template_file == NULL)
-    {
-        printf("Could not open file %s\n", template_file_path);
-        exit(1);
+    FILE *template_file = fopen(path_buffer, "r");
+    if (template_file == NULL) {
+        // perror provides a more descriptive error message (e.g., "No such file or directory")
+        fprintf(stderr, "Error opening template file '%s': ", path_buffer);
+        perror("");
+        return NULL;
     }
-    free(template_file_path);
 
     // Get the size of the template file
     fseek(template_file, 0, SEEK_END);
-    unsigned long template_size = ftell(template_file);
+    *file_size = ftell(template_file);
     rewind(template_file);
 
-    // Read the contents of the template file
-    if (template_size == 0 || template_size + 1 == 0) // SonarLint tricks
-    {
-        printf("Memory for template contents not properly allocated");
+    if (*file_size <= 0) {
+        fprintf(stderr, "Error: Template file is empty or cannot be read.\n");
+        fclose(template_file);
+        return NULL;
+    }
+
+    // Allocate memory for the template contents (+1 for the null terminator)
+    char *template_contents = malloc(*file_size + 1);
+    if (template_contents == NULL) {
+        fprintf(stderr, "Error: Failed to allocate memory for template.\n");
+        fclose(template_file);
+        return NULL;
+    }
+
+    // Read the file. Note the corrected parameters for fread.
+    // We read *file_size items of 1 byte each.
+    size_t bytes_read = fread(template_contents, 1, *file_size, template_file);
+    if (bytes_read != (size_t)*file_size) {
+        fprintf(stderr, "Error: Failed to read the entire template file.\n");
+        free(template_contents);
+        fclose(template_file);
+        return NULL;
+    }
+
+    // IMPORTANT: Null-terminate the buffer after reading.
+    template_contents[*file_size] = '\0';
+
+    fclose(template_file);
+    return template_contents;
+}
+
+
+/**
+ * @brief Creates N new files based on the template content.
+ *
+ * @param n The number of files to create (1-26).
+ * @param lang The language extension for the new files.
+ */
+void create_files(int n, const char *lang) {
+    long template_size = 0;
+    char *template_contents = read_template(lang, &template_size);
+
+    if (template_contents == NULL) {
+        // The error is already printed by read_template, so just exit.
         exit(1);
     }
 
-    string template_contents = malloc(template_size + 1);
+    const char alphabet[] = "abcdefghijklmnopqrstuvwxyz";
 
-    fread(template_contents, MAXLEN, template_size, template_file);
+    printf("Creating %d file(s) with extension '.%s'...\n", n, lang);
 
-    fclose(template_file);
-
-    for (int i = 0; i < n; i++)
-    {
-        string filename = malloc(MAXLEN);
-
-        sprintf(filename, "%c.%s", alphabet[i], lang);
+    for (int i = 0; i < n; i++) {
+        // Use a small, efficient stack-allocated buffer for the filename.
+        char filename[16];
+        snprintf(filename, sizeof(filename), "%c.%s", alphabet[i], lang);
 
         FILE *fp = fopen(filename, "w");
-        if (fp == NULL)
-        {
-            printf("Could not open file %s\n", filename);
-            free(filename);
-            continue;
+        if (fp == NULL) {
+            fprintf(stderr, "Could not create file '%s'. Skipping.\n", filename);
+            continue; // Skip to the next file
         }
 
+        // fputs is fine here since we null-terminated the content.
         fputs(template_contents, fp);
-
         fclose(fp);
-        free(filename);
+        printf(" -> Created %s\n", filename);
     }
 
+    // Free the memory allocated for the template content
     free(template_contents);
+    printf("Done.\n");
 }
