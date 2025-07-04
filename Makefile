@@ -17,8 +17,8 @@ $(TARGET): $(TARGET).c
 	$(CC) $(CFLAGS) -o $(TARGET) $(TARGET).c
 
 install: all check-templates
-	# Remove any file that might block directory creation
-	@if [ -f "$(TEMPLATE_DIR)" ]; then rm -f "$(TEMPLATE_DIR)"; fi
+	# Remove any file or directory that might block directory creation
+	@if [ -e "$(TEMPLATE_DIR)" ]; then rm -rf "$(TEMPLATE_DIR)"; fi
 	install -d $(TEMPLATE_DIR)
 	cp -R templates/* $(TEMPLATE_DIR)/
 	install -d $(DESTDIR)/usr/bin
